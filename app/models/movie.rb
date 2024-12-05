@@ -1,0 +1,15 @@
+class Movie < ApplicationRecord
+  belongs_to :director
+
+  include PgSearch::Model
+  multisearchable against: %i[title synopsis]
+''
+  pg_search_scope :search_by_title_and_synopsis, against: [:title, :synopsis], using: { tsearch: { prefix: true } }# <-- now `superman batm` will return something!
+
+  pg_search_scope :global_search,
+    against: [:title, :synopsis],
+    using: { tsearch: { prefix: true }},
+    associated_against: {
+      director: [:first_name, :last_name]
+    }
+end
